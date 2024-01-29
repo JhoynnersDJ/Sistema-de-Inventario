@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Comercial Beatriz la Quinta</title>
+        <!-- Agrega estos enlaces para incluir Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <link rel="stylesheet" href="styles.css">
+      </head>
+<body>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Menú</h2>
+      <ul>
+        <li><a href="#ventas">Ventas</a></li>
+        <li><a href="#cierre">Cierre de Venta</a></li>
+        <li><a href="#productos">Productos</a></li>
+      </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <header>
+        <h1>Comercial Beatriz la Quinta</h1>
+      </header>
+
+      <!-- Main Content -->
+      <div class="main-content" id="ventas">
+        <!-- Botón de VENTA -->
+        <button class="venta-btn" id="ventaBtn">VENTA</button>
+
+        <!-- Modal de Venta -->
+<!-- Modal de Venta con Bootstrap -->
+<div class="modal fade" id="ventaModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Registro de Venta</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+<!-- Formulario de Venta -->
+<form id="ventaForm">    
+    <div class="mb-3">
+      <label for="metodoPago" class="form-label">Método de Pago:</label>
+      <select class="form-select" id="metodoPago" name="metodoPago">
+        <option value="">Seleccionar método de pago</option>
+        <option value="punto_venta">Punto de Venta</option>
+        <option value="dolares">Dólares</option>
+        <option value="efectivo_bs">Efectivo Bolívares</option>
+      </select>
+    </div>
+  
+    <!-- Opciones específicas para Punto de Venta -->
+    <div class="mb-3" id="puntoVentaOptions" style="display: none;">
+      <label for="puntoVenta" class="form-label">Punto de Venta:</label>
+      <select class="form-select" id="puntoVenta" name="puntoVenta">
+        <option value="banesco_atletico">Banesco Mundo Atletico</option>
+        <option value="banesco_quinta">Banesco la Quinta</option>
+        <option value="venezuela">Banco de Venezuela</option>
+      </select>
+    </div>
+<!-- Campos para la información del producto -->
+<div class="mb-3">
+    <label for="producto" class="form-label">Producto:</label>
+    <input type="text" class="form-control" id="producto" name="producto" required>
+    <div id="sugerenciasProductos"></div>
+  </div>
+  <div class="mb-3">
+    <label for="precioProducto" class="form-label">Precio del Producto:</label>
+    <input type="number" class="form-control" id="precioProducto" name="precioProducto" value="0" readonly>
+  </div>
+  <div class="mb-3">
+    <label for="pesoKg" class="form-label">Peso en KG:</label>
+    <input type="number" class="form-control" id="pesoKg" name="pesoKg" required>
+  </div>
+  <div class="mb-3">
+    <label for="precioVenta" class="form-label">Precio de Venta:</label>
+    <input type="number" class="form-control" id="precioVenta" name="precioVenta" value="0" readonly>
+  </div>
+
+  <!-- Botón para agregar producto -->
+  <button type="button" class="btn btn-success" id="agregarProductoBtn">Agregar Producto</button>
+  
+            <button type="submit" class="btn btn-primary">Registrar Venta</button>
+          </form>
+          <!-- Tabla para mostrar los productos registrados -->
+        <table class="table mt-3">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Precio del Producto</th>
+                <th>Peso en KG</th>
+                <th>Precio de Venta</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="productosTablaBody">
+              <!-- Aquí se agregarán dinámicamente las filas de la tabla -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+      </div>
+
+      <!-- Footer -->
+      <footer>
+        <p>&copy; 2024 Comercial Beatriz la Quinta</p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
