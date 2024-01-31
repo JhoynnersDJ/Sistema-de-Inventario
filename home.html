@@ -18,7 +18,7 @@
       <ul>
         <li><a href="#ventas">Ventas</a></li>
         <li><a href="#cierre">Cierre de Venta</a></li>
-        <li><a href="#productos">Productos</a></li>
+        <li><a href="producto.html">Productos</a></li>
       </ul>
     </div>
 
@@ -44,7 +44,7 @@
         </div>
         <div class="modal-body">
 <!-- Formulario de Venta -->
-<form id="ventaForm">    
+<form id="ventaForm" autocomplete="off">    
     <div class="mb-3">
       <label for="metodoPago" class="form-label">Método de Pago:</label>
       <select class="form-select" id="metodoPago" name="metodoPago">
@@ -72,15 +72,15 @@
   </div>
   <div class="mb-3">
     <label for="precioProducto" class="form-label">Precio del Producto:</label>
-    <input type="number" class="form-control" id="precioProducto" name="precioProducto" value="0" readonly>
+    <input type="number" class="form-control" id="precioProducto" name="precioProducto">
   </div>
   <div class="mb-3">
     <label for="pesoKg" class="form-label">Peso en KG:</label>
     <input type="number" class="form-control" id="pesoKg" name="pesoKg" required>
   </div>
   <div class="mb-3">
-    <label for="precioVenta" class="form-label">Precio de Venta:</label>
-    <input type="number" class="form-control" id="precioVenta" name="precioVenta" value="0" readonly>
+    <label for="precioVenta" class="form-label">Precio de Venta en Dolares:</label>
+    <input type="number" class="form-control" id="precioVenta" name="precioVenta">
   </div>
 
   <!-- Botón para agregar producto -->
@@ -102,6 +102,13 @@
             <tbody id="productosTablaBody">
               <!-- Aquí se agregarán dinámicamente las filas de la tabla -->
             </tbody>
+            <tfoot>
+              <tr id="totalRow" style="background-color: #f5f5f5;">
+                <td colspan="3" class="fw-bold">TOTAL Venta</td>
+                <td id="totalVenta" class="fw-bold">$0.00</td>
+                <td></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>

@@ -3,6 +3,21 @@ const router = express.Router();
 const ProductoModel = require("../Modelo/ProductoModel");
 const TipoProductoModel = require("../Modelo/TipoProductoModel");
 
+// Ruta para obtener todos los tipos de producto
+router.get('/tipos-producto', async (req, res) => {
+  try {
+    // Consulta la base de datos para obtener todos los tipos de producto
+    const tiposProducto = await TipoProductoModel.find();
+
+    // Respuesta exitosa con los tipos de producto
+    res.status(200).json({ tiposProducto });
+  } catch (error) {
+    console.error(error);
+    // Manejo de errores
+    res.status(500).json({ error: 'Hubo un error al obtener los tipos de producto.' });
+  }
+});
+
 // Ruta para registrar un nuevo tipo de producto
 router.post('/registro-tipo-producto', async (req, res) => {
     try {
@@ -30,32 +45,32 @@ router.post('/registro-tipo-producto', async (req, res) => {
     }
   });
 
-    // Ruta para registrar un nuevo producto
-    router.post('/registro-producto', async (req, res) => {
-        try {
-      // Obtén los datos del cuerpo de la solicitud
-      const { nombre, id_tipo, peso_kg, costo } = req.body;
-  
-      // Verifica que se proporcionaron todos los campos necesarios
-      if (!nombre || !id_tipo || !peso_kg || !costo) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios para registrar un producto.' });
+      // Ruta para registrar un nuevo producto
+      router.post('/registro-producto', async (req, res) => {
+          try {
+        // Obtén los datos del cuerpo de la solicitud
+        const { nombre, id_tipo, peso_kg, costo } = req.body;
+    
+        // Verifica que se proporcionaron todos los campos necesarios
+        if (!nombre || !id_tipo || !peso_kg || !costo) {
+          return res.status(400).json({ error: 'Todos los campos son obligatorios para registrar un producto.' });
+        }
+    
+        // Crea una nueva instancia de producto
+        const nuevoProducto = new ProductoModel({ nombre, id_tipo, peso_kg, costo });
+    
+        // Guarda el producto en la base de datos
+        await nuevoProducto.save();
+    
+        // Respuesta exitosa
+        res.status(201).json({ message: 'Producto registrado con éxito.' });
+        console.log('Registro de producto exitoso');
+      } catch (error) {
+        console.error(error);
+        // Manejo de errores
+        res.status(500).json({ error: 'Hubo un error al registrar el producto.' });
       }
-  
-      // Crea una nueva instancia de producto
-      const nuevoProducto = new ProductoModel({ nombre, id_tipo, peso_kg, costo });
-  
-      // Guarda el producto en la base de datos
-      await nuevoProducto.save();
-  
-      // Respuesta exitosa
-      res.status(201).json({ message: 'Producto registrado con éxito.' });
-      console.log('Registro de producto exitoso');
-    } catch (error) {
-      console.error(error);
-      // Manejo de errores
-      res.status(500).json({ error: 'Hubo un error al registrar el producto.' });
-    }
-  });
+    });
 
   router.get('/buscar-producto-por-nombre/:nombreProducto', async (req, res) => {
     const nombreProducto = req.params.nombreProducto;

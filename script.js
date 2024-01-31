@@ -58,9 +58,9 @@ document.addEventListener('DOMContentLoaded', function () {
       const nuevaFila = document.createElement('tr');
       nuevaFila.innerHTML = `
         <td>${producto}</td>
-        <td>${precioProducto.toFixed(2)}</td>
-        <td>${pesoKg.toFixed(2)}</td>
-        <td>${precioVenta.toFixed(2)}</td>
+        <td>${precioProducto}$</td>
+        <td>${pesoKg} KG</td>
+        <td>${precioVenta}$</td>
         <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
       `;
   
@@ -77,13 +77,37 @@ document.addEventListener('DOMContentLoaded', function () {
       precioVentaInput.value = '0';
       // Limpiar las sugerencias después de agregar el producto
       sugerenciasProductos.innerHTML = '';
+      calcularTotalVenta();
     });
-  
-    // Función para eliminar una fila de la tabla
-    window.eliminarFila = function (botonEliminar) {
-      const fila = botonEliminar.closest('tr');
-      fila.remove();
-    };
+// Función para calcular el total de la venta y actualizar la fila del total
+function calcularTotalVenta() {
+  const filasProductos = productosTablaBody.querySelectorAll('tr');
+  let totalVenta = 0;
+
+  filasProductos.forEach(fila => {
+      const precioVentaCelula = fila.querySelector('td:nth-child(4)');
+      if (precioVentaCelula) {
+          const precioVenta = parseFloat(precioVentaCelula.textContent.replace('$', ''));
+          if (!isNaN(precioVenta)) {
+              totalVenta += precioVenta;
+          }
+      }
+  });
+
+  // Actualizar la celda del total con el nuevo total
+  const totalVentaElemento = document.getElementById('totalVenta');
+  if (totalVentaElemento) {
+      totalVentaElemento.textContent = `$${totalVenta.toFixed(2)}`;
+  }
+}
+// Función para eliminar una fila de la tabla
+window.eliminarFila = function (botonEliminar) {
+  const fila = botonEliminar.closest('tr');
+  fila.remove();
+
+  // Después de eliminar la fila, recalcular el total
+  calcularTotalVenta();
+};
   
     // Manejar el envío del formulario de venta
     ventaForm.addEventListener('submit', function (event) {
@@ -136,18 +160,18 @@ document.addEventListener('DOMContentLoaded', function () {
   
 // Función para actualizar las sugerencias de productos
 function actualizarSugerenciasProductos(sugerencias) {
-    // Obtener el contenedor de sugerencias
-    const sugerenciasProductos = document.getElementById('sugerenciasProductos');
-  
-    // Verificar si el contenedor existe
-    if (!sugerenciasProductos) {
-      console.error('Error: Contenedor de sugerencias no encontrado.');
-      return;
-    }
-  
-    // Limpiar las sugerencias anteriores
-    sugerenciasProductos.innerHTML = '';
-  
+  // Obtener el contenedor de sugerencias
+  const sugerenciasProductos = document.getElementById('sugerenciasProductos');
+
+  // Verificar si el contenedor existe
+  if (!sugerenciasProductos) {
+    console.error('Error: Contenedor de sugerencias no encontrado.');
+    return;
+  }
+
+  // Limpiar las sugerencias anteriores
+  sugerenciasProductos.innerHTML = '';
+
   // Crear elementos para cada sugerencia
   sugerencias.forEach(sugerencia => {
     const sugerenciaElement = document.createElement('div');
@@ -158,15 +182,16 @@ function actualizarSugerenciasProductos(sugerencias) {
     sugerenciaElement.addEventListener('click', function () {
       productoInput.value = sugerencia.nombre;
       sugerenciasProductos.innerHTML = ''; // Limpiar las sugerencias después de seleccionar
-      
+
       // Actualizar el valor del input precioProducto con el costo del producto seleccionado
       precioProductoInput.value = sugerencia.costo.toFixed(2);
-      
-      // Aplicar estilos al input precioProducto para simular la apariencia de un input deshabilitado
-      precioProductoInput.style.border = '1px solid #ced4da'; // Borde gris
-      precioProductoInput.style.backgroundColor = '#e9ecef'; // Fondo gris claro
-      precioProductoInput.style.color = '#495057'; // Texto gris oscuro
-      precioProductoInput.style.pointerEvents = 'none'; // Deshabilitar interacción
+
+      // Habilitar el input de precioProducto y restablecer estilos
+      precioProductoInput.disabled = false;
+      precioProductoInput.style.border = '1px solid #ced4da';
+      precioProductoInput.style.backgroundColor = 'white';
+      precioProductoInput.style.color = '#495057';
+      precioProductoInput.style.pointerEvents = 'auto';
     });
 
     // Agregar la sugerencia al contenedor
@@ -176,5 +201,28 @@ function actualizarSugerenciasProductos(sugerencias) {
   // Mostrar el contenedor de sugerencias
   sugerenciasProductos.style.display = 'block';
 }
+
+// Manejar cambios en el campo de pesoKg para calcular el precio de venta
+pesoKgInput.addEventListener('input', function () {
+  const costo = parseFloat(precioProductoInput.value);
+  const peso = parseFloat(pesoKgInput.value);
+
+  if (!isNaN(costo) && !isNaN(peso)) {
+    const precioVentaCalculado = costo * peso;
+    precioVentaInput.value = precioVentaCalculado.toFixed(2);
+  }
+});
+
+// Manejar cambios en el campo de precioVenta para calcular el peso
+precioVentaInput.addEventListener('input', function () {
+  const costo = parseFloat(precioProductoInput.value);
+  const precioVenta = parseFloat(precioVentaInput.value);
+
+  if (!isNaN(costo) && !isNaN(precioVenta) && costo !== 0) {
+    const pesoCalculado = precioVenta / costo;
+    pesoKgInput.value = pesoCalculado.toFixed(2);
+  }
+});
+
   });
   
