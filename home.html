@@ -44,11 +44,11 @@
         </div>
         <div class="modal-body">
 <!-- Formulario de Venta -->
-<form id="ventaForm" autocomplete="off">    
+<form id="ventaForm" autocomplete="off" novalidate>    
     <div class="mb-3">
       <label for="metodoPago" class="form-label">Método de Pago:</label>
       <select class="form-select" id="metodoPago" name="metodoPago">
-        <option value="">Seleccionar método de pago</option>
+        <option value="nada">Seleccionar método de pago</option>
         <option value="punto_venta">Punto de Venta</option>
         <option value="dolares">Dólares</option>
         <option value="efectivo_bs">Efectivo Bolívares</option>
@@ -59,9 +59,7 @@
     <div class="mb-3" id="puntoVentaOptions" style="display: none;">
       <label for="puntoVenta" class="form-label">Punto de Venta:</label>
       <select class="form-select" id="puntoVenta" name="puntoVenta">
-        <option value="banesco_atletico">Banesco Mundo Atletico</option>
-        <option value="banesco_quinta">Banesco la Quinta</option>
-        <option value="venezuela">Banco de Venezuela</option>
+        <!-- Las opciones se cargarán dinámicamente desde JavaScript -->
       </select>
     </div>
 <!-- Campos para la información del producto -->
@@ -116,7 +114,23 @@
   </div>
   
       </div>
+<!-- Añade una tabla en el home para mostrar los productos -->
+<table class="table mt-3">
+  <thead>
+      <tr>
+          <th>Producto</th>
+          <th>Precio del Producto</th>
+          <th>Peso en KG</th>
+          <th>Precio de Venta</th>
+      </tr>
+  </thead>
+  <tbody id="productosTablaBodyHome">
+      <!-- Aquí se agregarán dinámicamente las filas de la tabla -->
+  </tbody>
+</table>
 
+<!-- Nuevo botón "Concretar Venta" en el home -->
+<button class="btn btn-primary" id="concretarVentaBtn">Concretar Venta</button>
       <!-- Footer -->
       <footer>
         <p>&copy; 2024 Comercial Beatriz la Quinta</p>

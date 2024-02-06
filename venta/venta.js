@@ -8,7 +8,7 @@ router.post('/realizar-venta', async (req, res) => {
   try {
     // Obtén los datos del cuerpo de la solicitud
     const { productos_vendidos, id_punto_venta, metodo_pago } = req.body;
-
+    console.log(req.body);
     // Verifica que se proporcionaron todos los campos necesarios
     if (!productos_vendidos || !id_punto_venta || !metodo_pago) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios para realizar una venta.' });

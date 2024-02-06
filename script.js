@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded',async function () {
     const ventaBtn = document.getElementById('ventaBtn');
     const ventaModal = new bootstrap.Modal(document.getElementById('ventaModal'));
     const metodoPagoSelect = document.getElementById('metodoPago');
@@ -11,8 +11,68 @@ document.addEventListener('DOMContentLoaded', function () {
     const agregarProductoBtn = document.getElementById('agregarProductoBtn');
     const productosTablaBody = document.getElementById('productosTablaBody');
     const sugerenciasProductos = document.getElementById('sugerenciasProductos');
+    const puntoVentaSelect = document.getElementById('puntoVenta');
     let metodoPagoSeleccionado = false;
-  
+
+// Obtener el valor seleccionado (método de pago)
+const metodoPagoSelec = metodoPagoSelect.value;
+
+    // Cargar dinámicamente las opciones del select desde la base de datos
+  try {
+    const response = await fetch('http://localhost:8000/punto/puntos-venta');
+    const data = await response.json();
+
+    if (response.ok) {
+      // Limpiar las opciones existentes del select
+      puntoVentaSelect.innerHTML = '';
+
+      // Llenar el select con las opciones obtenidas desde la base de datos
+      data.puntosVenta.forEach(puntoVenta => {
+        const option = document.createElement('option');
+        option.value = puntoVenta._id; // Puedes usar el ID u otro campo único
+        option.textContent = puntoVenta.nombre; // Asegúrate de tener un campo 'nombre' en tu modelo
+        puntoVentaSelect.appendChild(option);
+      });
+    } else {
+      console.log('Error al obtener puntos de venta:', data.error);
+    }
+  } catch (error) {
+    console.error('Error al obtener puntos de venta:', error);
+  }
+  // Variable global para almacenar el ID del punto de venta seleccionado
+let idPuntoVentaSeleccionado = null;
+
+function capturarIdPuntoVenta() {
+  // Obtener el elemento select
+  const puntoVentaSelect = document.getElementById('puntoVenta');
+
+  // Obtener el valor seleccionado (ID del punto de venta)
+  idPuntoVentaSeleccionado = puntoVentaSelect.value;
+
+  // Puedes imprimir en la consola para verificar que se captura correctamente
+  console.log('ID del Punto de Venta seleccionado:', idPuntoVentaSeleccionado);
+}
+  // Función para obtener los productos de la venta desde la tabla
+  function obtenerProductosVenta() {
+    const filasProductos = productosTablaBody.querySelectorAll('tr');
+    const productosVenta = [];
+
+    filasProductos.forEach(fila => {
+        const nombre = fila.querySelector('td:nth-child(1)').textContent;
+        const precioProducto = parseFloat(fila.querySelector('td:nth-child(2)').textContent.replace('$', ''));
+        const pesoKg = parseFloat(fila.querySelector('td:nth-child(3)').textContent.replace('KG', ''));
+        const precioVenta = parseFloat(fila.querySelector('td:nth-child(4)').textContent.replace('$', ''));
+
+        productosVenta.push({
+            nombre,
+            precioProducto,
+            pesoKg,
+            precioVenta,
+        });
+    });
+
+    return productosVenta;
+}
     // Mostrar u ocultar opciones específicas para Punto de Venta según el método de pago seleccionado
     metodoPagoSelect.addEventListener('change', function () {
       if (metodoPagoSelect.value === 'punto_venta') {
@@ -109,54 +169,84 @@ window.eliminarFila = function (botonEliminar) {
   calcularTotalVenta();
 };
   
-    // Manejar el envío del formulario de venta
-    ventaForm.addEventListener('submit', function (event) {
-      event.preventDefault();
-  
-      // Realizar operaciones necesarias con la información del formulario
-  
-      // Limpiar la tabla de productos después de registrar la venta
-      productosTablaBody.innerHTML = '';
-  
-      // Cerrar el modal después de realizar la venta
-      ventaModal.hide();
-  
-      // Puedes agregar la lógica para enviar la información al backend aquí
-    });
-  
-    productoInput.addEventListener('input', async function () {
-        const nombreProducto = productoInput.value.trim();
-      
-        if (!nombreProducto) {
-          sugerenciasProductos.innerHTML = '';
-          return;
+      // Manejar el envío del formulario de venta
+      ventaForm.addEventListener('submit',async function (event) {
+        event.preventDefault();
+    
+        // Realizar operaciones necesarias con la información del formulario
+        const productosVenta = obtenerProductosVenta();
+        // Imprimir los productos de la venta en la consola
+console.log('Productos de la venta:', productosVenta); 
+        // Limpiar la tabla de productos después de registrar la venta
+
+        const id_punto_venta = capturarIdPuntoVenta();
+        productosTablaBody.innerHTML = '';
+        // Cerrar el modal después de realizar la venta
+        ventaModal.hide();
+        //Variables esenciales para la venta
+// Implementa esta función según tu lógica
+        
+    // Aquí es donde debes agregar la lógica para enviar la información al backend
+      // Puedes utilizar fetch u otras bibliotecas para realizar la petición HTTP
+      try {
+        const response = await fetch('http://localhost:8000/venta/realizar-venta', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // Incluir los datos necesarios para la venta (productos, método de pago, etc.)
+                // Puedes obtener esta información de las variables definidas en tu script.js
+                productos_vendidos: productosVenta,
+                id_punto_venta: idPuntoVentaSeleccionado, // Asegúrate de tener la variable con el ID del punto de venta
+                metodo_pago: metodoPagoSelec, // Asegúrate de tener la variable con el método de pago
+            }),
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+            console.log('Venta realizada con éxito:', data.message);
+        } else {
+            console.log('Error al realizar la venta:', data.error);
         }
-      
-        if (nombreProducto.length > 0) {
-          console.log('Enviando petición al backend...');
-      
-          try {
-            const response = await fetch(`http://localhost:8000/productos/buscar-producto-por-nombre/${nombreProducto}`);
-            const data = await response.json();
-      
-            if (response.ok) {
-              // Actualizar las sugerencias con el resultado de la búsqueda
-              actualizarSugerenciasProductos(data.productos);
-              console.log('Productos encontrados:', data.productos);
-      
-              // Actualizar el valor del input precioProducto con el costo del primer producto encontrado
-              if (data.productos.length > 0) {
-                const costoProducto = data.productos[0].costo;
-                precioProductoInput.value = costoProducto.toFixed(2);
-              }
-            } else {
-              console.log('Error en la respuesta:', data.mensaje);
-            }
-          } catch (error) {
-            console.error('Error al buscar productos:', error);
-          }
-        }
+    } catch (error) {
+        console.error('Error al realizar la venta:', error);
+    }
       });
+    
+      productoInput.addEventListener('input', async function () {
+          const nombreProducto = productoInput.value.trim();
+        
+          if (!nombreProducto) {
+            sugerenciasProductos.innerHTML = '';
+            return;
+          }
+        
+          if (nombreProducto.length > 0) {
+            console.log('Enviando petición al backend...');
+        
+            try {
+              const response = await fetch(`http://localhost:8000/productos/buscar-producto-por-nombre/${nombreProducto}`);
+              const data = await response.json();
+        
+              if (response.ok) {
+                // Actualizar las sugerencias con el resultado de la búsqueda
+                actualizarSugerenciasProductos(data.productos);
+                console.log('Productos encontrados:', data.productos);
+        
+                // Actualizar el valor del input precioProducto con el costo del primer producto encontrado
+                if (data.productos.length > 0) {
+                  const costoProducto = data.productos[0].costo;
+                  precioProductoInput.value = costoProducto.toFixed(2);
+                }
+              } else {
+                console.log('Error en la respuesta:', data.mensaje);
+              }
+            } catch (error) {
+              console.error('Error al buscar productos:', error);
+            }
+          }
+        });
   
 // Función para actualizar las sugerencias de productos
 function actualizarSugerenciasProductos(sugerencias) {
@@ -187,11 +277,11 @@ function actualizarSugerenciasProductos(sugerencias) {
       precioProductoInput.value = sugerencia.costo.toFixed(2);
 
       // Habilitar el input de precioProducto y restablecer estilos
-      precioProductoInput.disabled = false;
-      precioProductoInput.style.border = '1px solid #ced4da';
-      precioProductoInput.style.backgroundColor = 'white';
-      precioProductoInput.style.color = '#495057';
-      precioProductoInput.style.pointerEvents = 'auto';
+      precioProductoInput.disabled = true;
+      precioProductoInput.style.border = '1px solid #ddd';
+      precioProductoInput.style.backgroundColor = '#f8f9fa';
+      precioProductoInput.style.color = '#6c757d';
+      precioProductoInput.style.pointerEvents = 'none';
     });
 
     // Agregar la sugerencia al contenedor

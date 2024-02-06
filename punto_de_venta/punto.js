@@ -28,5 +28,18 @@ router.post('/registro-punto-venta', async (req, res) => {
     res.status(500).json({ error: 'Hubo un error al registrar el punto de venta.' });
   }
 });
+// Ruta para obtener todos los puntos de venta
+router.get('/puntos-venta', async (req, res) => {
+  try {
+    // Consulta todos los puntos de venta en la base de datos
+    const puntosVenta = await PuntoVentaModel.find();
 
+    // Respuesta exitosa con la lista de puntos de venta
+    res.status(200).json({ puntosVenta });
+  } catch (error) {
+    console.error(error);
+    // Manejo de errores
+    res.status(500).json({ error: 'Hubo un error al obtener los puntos de venta.' });
+  }
+});
 module.exports = router;
