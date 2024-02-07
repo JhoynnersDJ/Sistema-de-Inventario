@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded',async function () {
     const sugerenciasProductos = document.getElementById('sugerenciasProductos');
     const puntoVentaSelect = document.getElementById('puntoVenta');
     let metodoPagoSeleccionado = false;
-
-// Obtener el valor seleccionado (método de pago)
-const metodoPagoSelec = metodoPagoSelect.value;
+    let metodoPagoSelec;
+    let id_punto_venta; 
+    let totalVenta;
 
     // Cargar dinámicamente las opciones del select desde la base de datos
   try {
@@ -74,14 +74,25 @@ function capturarIdPuntoVenta() {
     return productosVenta;
 }
     // Mostrar u ocultar opciones específicas para Punto de Venta según el método de pago seleccionado
-    metodoPagoSelect.addEventListener('change', function () {
-      if (metodoPagoSelect.value === 'punto_venta') {
-        puntoVentaOptions.style.display = 'block';
-      } else {
-        puntoVentaOptions.style.display = 'none';
-      }
-      metodoPagoSeleccionado = true;
-    });
+metodoPagoSelect.addEventListener('change', function () {
+  if (metodoPagoSelect.value === 'punto_venta') {
+    metodoPagoSelec = metodoPagoSelect.value;   
+    puntoVentaOptions.style.display = 'block';
+    capturarIdPuntoVenta();
+  } else {
+    puntoVentaOptions.style.display = 'none';
+  }
+  metodoPagoSelec = metodoPagoSelect.value;
+  metodoPagoSeleccionado = true;
+});
+
+// Escuchar cambios en el select de punto de venta
+puntoVentaSelect.addEventListener('change', function () {
+  // Llamar a la función para capturar el ID del punto de venta solo si se selecciona el método de pago "punto_venta"
+  if (metodoPagoSelect.value === 'punto_venta') {
+    capturarIdPuntoVenta();
+  }
+})
   
     // Al cargar la página, asegurarse de que las opciones específicas para Punto de Venta estén ocultas
     puntoVentaOptions.style.display = 'none';
@@ -142,16 +153,18 @@ function capturarIdPuntoVenta() {
 // Función para calcular el total de la venta y actualizar la fila del total
 function calcularTotalVenta() {
   const filasProductos = productosTablaBody.querySelectorAll('tr');
-  let totalVenta = 0;
+   totalVenta = 0;
 
   filasProductos.forEach(fila => {
       const precioVentaCelula = fila.querySelector('td:nth-child(4)');
       if (precioVentaCelula) {
           const precioVenta = parseFloat(precioVentaCelula.textContent.replace('$', ''));
+          console.log('Precio de venta:', precioVenta); // Agrega este console.log()
           if (!isNaN(precioVenta)) {
               totalVenta += precioVenta;
           }
       }
+      return totalVenta;
   });
 
   // Actualizar la celda del total con el nuevo total
@@ -159,15 +172,9 @@ function calcularTotalVenta() {
   if (totalVentaElemento) {
       totalVentaElemento.textContent = `$${totalVenta.toFixed(2)}`;
   }
-}
-// Función para eliminar una fila de la tabla
-window.eliminarFila = function (botonEliminar) {
-  const fila = botonEliminar.closest('tr');
-  fila.remove();
 
-  // Después de eliminar la fila, recalcular el total
-  calcularTotalVenta();
-};
+  console.log('Total de la venta:', totalVenta); // Agrega este console.log() para verificar el total
+}
   
       // Manejar el envío del formulario de venta
       ventaForm.addEventListener('submit',async function (event) {
@@ -179,7 +186,7 @@ window.eliminarFila = function (botonEliminar) {
 console.log('Productos de la venta:', productosVenta); 
         // Limpiar la tabla de productos después de registrar la venta
 
-        const id_punto_venta = capturarIdPuntoVenta();
+        
         productosTablaBody.innerHTML = '';
         // Cerrar el modal después de realizar la venta
         ventaModal.hide();
@@ -189,19 +196,20 @@ console.log('Productos de la venta:', productosVenta);
     // Aquí es donde debes agregar la lógica para enviar la información al backend
       // Puedes utilizar fetch u otras bibliotecas para realizar la petición HTTP
       try {
-        const response = await fetch('http://localhost:8000/venta/realizar-venta', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                // Incluir los datos necesarios para la venta (productos, método de pago, etc.)
-                // Puedes obtener esta información de las variables definidas en tu script.js
+        console.log("total antes de: ",totalVenta);
+                const requestBody = {
                 productos_vendidos: productosVenta,
                 id_punto_venta: idPuntoVentaSeleccionado, // Asegúrate de tener la variable con el ID del punto de venta
                 metodo_pago: metodoPagoSelec, // Asegúrate de tener la variable con el método de pago
-            }),
-        });
+                total_venta:totalVenta,
+        }
+  const response = await fetch('http://localhost:8000/venta/realizar-venta', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+});
         const data = await response.json();
         
         if (response.ok) {

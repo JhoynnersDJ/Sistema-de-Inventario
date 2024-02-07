@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 
 const productoVendidoSchema = new mongoose.Schema({
   id_producto: { type: mongoose.Schema.Types.ObjectId, ref: 'Producto' },
-  cantidad_vendida_kg: Number
+  precioProducto:Number,
+  pesoKg: Number,
+  precioVenta: Number,
 });
 
 const ventaSchema = new mongoose.Schema({
@@ -11,7 +13,8 @@ const ventaSchema = new mongoose.Schema({
   fecha: Date,
   hora: String,
   metodo_pago: String,
-  id_punto_venta: { type: mongoose.Schema.Types.ObjectId, ref: 'PuntoVenta' }
+  id_punto_venta: { type: mongoose.Schema.Types.ObjectId, ref: 'PuntoVenta', required: false }, // Hacer el campo opcional
+  total_venta:Number,
 });
 
 const VentaModel = mongoose.model('Venta', ventaSchema);
